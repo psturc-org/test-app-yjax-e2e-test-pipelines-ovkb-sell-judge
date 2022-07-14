@@ -1,0 +1,50 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  creationTimestamp: null
+  name: test-component--wsrk
+  namespace: e2e-test-pipelines-ovkb
+spec:
+  params:
+  - name: git-revision
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      annotations:
+        build.appstudio.openshift.io/application: test-app-yjax
+        build.appstudio.openshift.io/build: "true"
+        build.appstudio.openshift.io/component: test-component--wsrk
+        build.appstudio.openshift.io/type: build
+        build.appstudio.openshift.io/version: "0.1"
+        pipelines.appstudio.openshift.io/type: build
+      creationTimestamp: null
+      generateName: test-component--wsrk-
+      labels:
+        build.appstudio.openshift.io/application: test-app-yjax
+        build.appstudio.openshift.io/build: "true"
+        build.appstudio.openshift.io/component: test-component--wsrk
+        build.appstudio.openshift.io/type: build
+        build.appstudio.openshift.io/version: "0.1"
+        pipelines.appstudio.openshift.io/type: build
+      namespace: e2e-test-pipelines-ovkb
+    spec:
+      params:
+      - name: git-url
+        value: https://github.com/psturc/simple-nodejs-app
+      - name: output-image
+        value: quay.io/psturc/test-images:90c366b6a284448d8541e71a47ccc38b-$(tt.params.git-revision)
+      - name: dockerfile
+        value: docker/Dockerfile
+      - name: path-context
+        value: .
+      pipelineRef:
+        bundle: quay.io/redhat-appstudio/hacbs-templates-bundle:ad4c34b71d468a991450b0091cd96765471ed82d
+        name: docker-build
+      workspaces:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: appstudio
+        subPath: test-component--wsrk/$(tt.params.git-revision)
+    status: {}
+status: {}
